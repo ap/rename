@@ -43,6 +43,7 @@ sub argv_to_subst_expr {
 }
 
 my ( $VERB, @EXPR );
+my $do_keep_ext;
 
 GetOptions(
 	'h|help'                    => sub { pod2usage( -verbose => 1 ) },
@@ -67,7 +68,8 @@ GetOptions(
 	'S|subst-all'               => sub { push @EXPR, argv_to_subst_expr('g') },
 	't|sort-time'               => \my $opt_time_sort,
 	'v|verbose+'                => \$msglevel,
-	'x|remove-extension'        => sub { push @EXPR, '$_ = substr $_, 0, rindex $_, "."' },
+	'x|remove-extension'        => sub { push @EXPR, 's/(\.[^.]+)\z//' },
+	'X|keep-extension'          => sub { push @EXPR, 's/(\.[^.]+)\z// and substr $::EXT, 0, 0, $1'; ++$do_keep_ext },
 	'camelcase'                 => sub { push @EXPR, 's/(?<![.[:alnum:]])([[:alpha:]])/\U$1/g' },
 	'urlesc'                    => sub { push @EXPR, 's/%([0-9A-F][0-9A-F])/chr hex $1/ieg' },
 	'nows'                      => sub { push @EXPR, 's/[_[:blank:]]+/_/g' },
@@ -87,7 +89,12 @@ pod2usage( -verbose => 1 ) if $opt_null and @ARGV;
 ++$msglevel if $opt_dryrun;
 
 my $code = do {
-	my $cat = "sub { ".join('; ', @EXPR)." }";
+	if ( $do_keep_ext ) {
+		unshift @EXPR, '$::EXT = ""';
+		push    @EXPR, '$_ .= $::EXT';
+	}
+
+	my $cat = sprintf 'sub { %s }', join '; ', @EXPR;
 	DEBUG { "Using expression: $cat" };
 
 	my $evaled = eval $cat;
@@ -306,6 +313,12 @@ Print additional information about the operations (not) executed.
 =item B<-x>, B<--remove-extension>
 
 Remove the last extension from a filename, if there is any.
+
+=item B<-X>, B<--keep-extension>
+
+Save and remove the last extension from a filename, if there is any. The saved extension will be appended back to the filename at the end of the rest of the operations.
+
+Repeating this option will save multiple levels of extension in the right order.
 
 =item B<--camelcase>
 
