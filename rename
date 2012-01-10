@@ -234,9 +234,9 @@ Note however that expressive options are order sensitive. The following would pr
 
  rename -s foo bar -s bar baz *
 
-Since operations are cumulative, this would end up substituting (some of) the F<foo> matches in filenames with F<baz>! So pay attention to order. You may want to request a verbose dry run with C<-nv> for the first stab at a complex rename operation.
+Since operations are cumulative, this would end up substituting (some of) the F<foo> matches in filenames with F<baz>! So pay attention to order. You may want to request a verbose dry run with C<-n> for the first stab at a complex rename operation.
 
- rename -nv -s bar baz -s foo bar *
+ rename -n -s bar baz -s foo bar *
 
 You can combine the various expressive options to suit your needs. F.ex files from Microsoft(tm) Windows systems often have blanks and (sometimes nothing but) capital letters in their names. Let's say you have a bunch of such files to clean up, and you also want to move them to subdirectories based on extension. The following command should help:
 
