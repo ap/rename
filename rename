@@ -230,7 +230,7 @@ You can always do multiple changes in one go:
 
  rename -s .tgz .tar.gz -s .tbz2 .tar.bz2 *.tar.*
 
-Note however that expressive options are order sensitive. The following would probably surprise you:
+Note however that transformational options are order sensitive. The following would probably surprise you:
 
  rename -s foo bar -s bar baz *
 
@@ -238,11 +238,11 @@ Since operations are cumulative, this would end up substituting (some of) the F<
 
  rename -n -s bar baz -s foo bar *
 
-You can combine the various expressive options to suit your needs. F.ex files from Microsoft(tm) Windows systems often have blanks and (sometimes nothing but) capital letters in their names. Let's say you have a bunch of such files to clean up, and you also want to move them to subdirectories based on extension. The following command should help:
+You can combine the various transformational options to suit your needs. F.ex files from Microsoft(tm) Windows systems often have blanks and (sometimes nothing but) capital letters in their names. Let's say you have a bunch of such files to clean up, and you also want to move them to subdirectories based on extension. The following command should help:
 
  rename -p -c --noctrl --nometa --nows -e '$_ = "$1/$_" if /(\..*)\z/' *
 
-Again you need to pay attention to order sensitivity for expressive options. If you placed the C<-c> after the C<-e> in the above example, files with F<.zip> and F<.ZIP> extensions would be (attempted to be) moved to different directories because the directory name prefix would be added before the filenames were normalized. Once again, use verbose dry run requested using C<-nv> to get an idea of what exactly a complex rename operation is going to do.
+Again you need to pay attention to order sensitivity for transformational options. If you placed the C<-c> after the C<-e> in the above example, files with F<.zip> and F<.ZIP> extensions would be (attempted to be) moved to different directories because the directory name prefix would be added before the filenames were normalized. Once again, use verbose dry run requested using C<-nv> to get an idea of what exactly a complex rename operation is going to do.
 
 =head1 OPTIONS
 
