@@ -87,6 +87,7 @@ GetOptions(
 	'camelcase'                 => sub { push @EXPR, 's/([[:alpha:]])/\U$1/g' },
 	'urlesc'                    => sub { push @EXPR, 's/%([0-9A-F][0-9A-F])/chr hex $1/ieg' },
 	'nows'                      => sub { push @EXPR, 's/[_[:blank:]]+/_/g' },
+	'rews'                      => sub { push @EXPR, 'y/_/ /' },
 	'noctrl'                    => sub { push @EXPR, 's/[_[:cntrl:]]+/_/g' },
 	'nometa'                    => sub { push @EXPR, 'tr/_!"&()=?`*\';<>|$/_/s' },
 ) or pod2usage();
@@ -349,6 +350,10 @@ Decode URL-escaped filenames, such as wget(1) used to produce.
 =item B<--nows>
 
 Replace all sequences of whitespace in the filename with single underscore characters.
+
+=item B<--rews>
+
+Reverse C<--nows>: replace each underscore in the filename with a space.
 
 =item B<--noctrl>
 
