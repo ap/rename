@@ -391,19 +391,3 @@ Idea, inspiration and original code from Larry Wall and Robin Barker.
 =head1 COPYRIGHT
 
 This script is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
-
-=begin TODO
-
-=head2 Provide globals with parts of the filename
-
-=over 4
-
-=item * Split path on slashes, put into C<@dir>
-
-=item * Split filename on first or last dot (but not at start of filename), put basename in C<$base>, suffix in C<$ext>
-
-=back
-
-=head2 Keep track of directory renames
-
-So that it can ensure that when you've renamed a directory, subsequent renames of stuff under that directory don't fail.
