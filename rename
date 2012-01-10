@@ -226,7 +226,7 @@ If you are confident that none of the filenames has C<.bak> anywhere else than a
 
  rename -s .bak '' *.bak
 
-You can always do multiple changes in one ago:
+You can always do multiple changes in one go:
 
  rename -s .tgz .tar.gz -s .tbz2 .tar.bz2 *.tar.*
 
