@@ -70,7 +70,7 @@ GetOptions(
 	'v|verbose+'                => \$msglevel,
 	'x|remove-extension'        => sub { push @EXPR, 's/(\.[^.]+)\z//' },
 	'X|keep-extension'          => sub { push @EXPR, 's/(\.[^.]+)\z// and substr $::EXT, 0, 0, $1'; ++$do_keep_ext },
-	'camelcase'                 => sub { push @EXPR, 's/(?<![.[:alnum:]])([[:alpha:]])/\U$1/g' },
+	'camelcase'                 => sub { push @EXPR, 's/([[:alpha:]])/\U$1/g' },
 	'urlesc'                    => sub { push @EXPR, 's/%([0-9A-F][0-9A-F])/chr hex $1/ieg' },
 	'nows'                      => sub { push @EXPR, 's/[_[:blank:]]+/_/g' },
 	'noctrl'                    => sub { push @EXPR, 's/[_[:cntrl:]]+/_/g' },
