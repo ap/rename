@@ -62,13 +62,6 @@ GetOptions(
 	'h|help'                    => sub { pod2usage( -verbose => 1 ) },
 	'man'                       => sub { pod2usage( -verbose => 2 ) },
 	'0|null'                    => \my $opt_null,
-	'a|append=s'                => sub { push @EXPR, "\$_ .= qq[${\quotemeta $_[1]}]" },
-	'A|prepend=s'               => sub { push @EXPR, "substr \$_, 0, 0, qq[${\quotemeta $_[1]}]" },
-	'c|lower-case'              => sub { push @EXPR, 's/([[:upper:]]+)/\L$1/g' },
-	'C|upper-case'              => sub { push @EXPR, 's/([[:lower:]]+)/\U$1/g' },
-	'd|delete=s'                => sub { push @EXPR, "s/${\quotemeta $_[1]}//" },
-	'D|delete-all=s'            => sub { push @EXPR, "s/${\quotemeta $_[1]}//g" },
-	'e|expr=s'                  => \@EXPR,
 	'f|force'                   => \my $opt_force,
 	'g|glob'                    => \my $opt_glob,
 	'i|interactive'             => \my $opt_interactive,
@@ -77,11 +70,19 @@ GetOptions(
 	'L|hardlink'                => sub { $VERB ? pod2usage( -verbose => 1 ) : ( $VERB = VERB_FOR->{    'link' } ) },
 	'n|just-print|dry-run'      => \my $opt_dryrun,
 	'p|mkpath|make-dirs'        => \my $opt_mkpath,
+	't|sort-time'               => \my $opt_time_sort,
+	'v|verbose+'                => \$msglevel,
+
+	'a|append=s'                => sub { push @EXPR, "\$_ .= qq[${\quotemeta $_[1]}]" },
+	'A|prepend=s'               => sub { push @EXPR, "substr \$_, 0, 0, qq[${\quotemeta $_[1]}]" },
+	'c|lower-case'              => sub { push @EXPR, 's/([[:upper:]]+)/\L$1/g' },
+	'C|upper-case'              => sub { push @EXPR, 's/([[:lower:]]+)/\U$1/g' },
+	'd|delete=s'                => sub { push @EXPR, "s/${\quotemeta $_[1]}//" },
+	'D|delete-all=s'            => sub { push @EXPR, "s/${\quotemeta $_[1]}//g" },
+	'e|expr=s'                  => \@EXPR,
 	'P|pipe=s'                  => sub { require IPC::Open2; push @EXPR, "pipe_through '\Q$_[1]\E'" },
 	's|subst'                   => sub { push @EXPR, argv_to_subst_expr },
 	'S|subst-all'               => sub { push @EXPR, argv_to_subst_expr('g') },
-	't|sort-time'               => \my $opt_time_sort,
-	'v|verbose+'                => \$msglevel,
 	'x|remove-extension'        => sub { push @EXPR, 's/(\.[^.]+)\z//' },
 	'X|keep-extension'          => sub { push @EXPR, 's/(\.[^.]+)\z// and substr $::EXT, 0, 0, $1'; ++$do_keep_ext },
 	'camelcase'                 => sub { push @EXPR, 's/([[:alpha:]])/\U$1/g' },
@@ -245,6 +246,8 @@ Again you need to pay attention to order sensitivity for expressive options. If 
 
 =head1 OPTIONS
 
+=head2 Switches
+
 =over 4
 
 =item B<-h>, B<--help>
@@ -258,26 +261,6 @@ Browse the manpage.
 =item B<-0>, B<--null>
 
 When reading file names from C<STDIN>, split on NUL bytes instead of newlines. This is useful in combination with GNU find's C<-print0> option, GNU grep's C<-Z> option, and GNU sort's C<-z> option, to name just a few. B<Only valid if no filenames have been given on the commandline.>
-
-=item B<-a>, B<--append>
-
-Append the string argument you supply to every filename.
-
-=item B<-A>, B<--prepend>
-
-Prepend the string argument you supply to every filename.
-
-=item B<-c>, B<--lower-case>
-
-Convert file names to all lower case.
-
-=item B<-C>, B<--upper-case>
-
-Convert file names to all upper case.
-
-=item B<-e>, B<--expr>
-
-The C<code> argument to this option should be a Perl expression that assumes the filename in the C<$_> variable and modifies it for the filenames to be renamed. When no other C<-c>, C<-C>, C<-e>, C<-s>, or C<-z> options are given, you can omit the C<-e> from infront of the code.
 
 =item B<-f>, B<--force>
 
@@ -311,6 +294,36 @@ Show how the files would be renamed, but don't actually do anything.
 
 Create any non-existent directories in the target path. This is very handy if you want to scatter a pile of files into subdirectories based on some part of their name (eg. the first two letters or the extension): you don't need to make all necessary directories beforehand, just tell C<rename> to create them as necessary.
 
+=item B<-v>, B<--verbose>
+
+Print additional information about the operations (not) executed.
+
+=back
+
+=head2 Transforms
+
+=over 4
+
+=item B<-a>, B<--append>
+
+Append the string argument you supply to every filename.
+
+=item B<-A>, B<--prepend>
+
+Prepend the string argument you supply to every filename.
+
+=item B<-c>, B<--lower-case>
+
+Convert file names to all lower case.
+
+=item B<-C>, B<--upper-case>
+
+Convert file names to all upper case.
+
+=item B<-e>, B<--expr>
+
+The C<code> argument to this option should be a Perl expression that assumes the filename in the C<$_> variable and modifies it for the filenames to be renamed. When no other C<-c>, C<-C>, C<-e>, C<-s>, or C<-z> options are given, you can omit the C<-e> from infront of the code.
+
 =item B<-P>, B<--pipe>
 
 Pass the filename to an external command on its standard input and read back the transformed filename on its standard output.
@@ -324,10 +337,6 @@ Quoting issues aside, this is equivalent to supplying a C<-e 's/\Qfrom/to/'>.
 =item B<-S>, B<--subst-all>
 
 Same as C<-s>, but replaces I<every> instance of the C<from> text by the C<to> text.
-
-=item B<-v>, B<--verbose>
-
-Print additional information about the operations (not) executed.
 
 =item B<-x>, B<--remove-extension>
 
