@@ -107,7 +107,7 @@ pod2usage( -verbose => 1 ) if $opt_null and @ARGV;
 my $code = do {
 	if ( $do_keep_ext ) {
 		unshift @EXPR, '$::EXT = ""';
-		push    @EXPR, '$_ .= $::EXT';
+		push    @EXPR, 'substr $::EXT, 0, 1, "" if not length; $_ .= $::EXT';
 	}
 
 	my $cat = sprintf 'sub { %s }', join '; ', @EXPR;
