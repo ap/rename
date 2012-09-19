@@ -416,6 +416,22 @@ Replace every shell meta-character by an underscore.
 
 =back
 
+=head1 COOKBOOK
+
+Using the C<-M> switch, you can quickly put F<rename> to use for just about everything the CPAN offers:
+
+=head2 Coarsely latinize a directory full of files with non-Latin characters
+
+ rename -T utf8 -MText::Unidecode '$_ = unidecode $_' *
+
+See L<Text::Unidecode>.
+
+=head2 Sort a directory of pictures into monthwise subdirectories
+
+ rename -p -MImage::EXIF '$_ = "$1-$2/$_" if Image::EXIF->new->file_name($_)->get_image_info->{"Image Created"} =~ /(\d\d\d\d):(\d\d)/'
+
+See L<Image::EXIF>.
+
 =head1 SEE ALSO
 
 mv(1), perl(1), find(1), grep(1), sort(1)
