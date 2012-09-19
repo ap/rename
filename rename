@@ -57,7 +57,6 @@ sub pipe_through {
 
 my ( $VERB, @EXPR );
 my $do_keep_ext;
-my $do_transcode;
 
 GetOptions(
 	'h|help'                    => sub { pod2usage( -verbose => 1 ) },
@@ -74,6 +73,8 @@ GetOptions(
 	't|sort-time'               => \my $opt_time_sort,
 	'v|verbose+'                => \$msglevel,
 
+	'T|transcode=s'             => \my $opt_transcode,
+
 	'a|append=s'                => sub { push @EXPR, "\$_ .= qq[${\quotemeta $_[1]}]" },
 	'A|prepend=s'               => sub { push @EXPR, "substr \$_, 0, 0, qq[${\quotemeta $_[1]}]" },
 	'c|lower-case'              => sub { push @EXPR, 's/([[:upper:]]+)/\L$1/g' },
@@ -84,7 +85,6 @@ GetOptions(
 	'P|pipe=s'                  => sub { require IPC::Open2; push @EXPR, "pipe_through '\Q$_[1]\E'" },
 	's|subst'                   => sub { push @EXPR, argv_to_subst_expr },
 	'S|subst-all'               => sub { push @EXPR, argv_to_subst_expr('g') },
-	'T|transcode=s'             => sub { push @EXPR, ''; $do_transcode = $_[1] },
 	'x|remove-extension'        => sub { push @EXPR, 's/(\.[^.]+)\z//' },
 	'X|keep-extension'          => sub { push @EXPR, 's/(\.[^.]+)\z// and substr $::EXT, 0, 0, $1'; ++$do_keep_ext },
 	'camelcase'                 => sub { push @EXPR, 's/([[:alpha:]])/\U$1/g' },
@@ -112,9 +112,9 @@ my $code = do {
 		push    @EXPR, 'substr $::EXT, 0, 1, "" if not length; $_ .= $::EXT';
 	}
 
-	if ( $do_transcode ) {
+	if ( $opt_transcode ) {
 		require Encode;
-		my ( $in_enc, $out_enc ) = split /:/, $do_transcode, 2;
+		my ( $in_enc, $out_enc ) = split /:/, $opt_transcode, 2;
 		$::DECODE = Encode::find_encoding( $in_enc );
 		die "No such encoding $in_enc\n" if not ref $::DECODE;
 		$::ENCODE = defined $out_enc ? Encode::find_encoding( $out_enc ) : $::DECODE;
@@ -313,7 +313,21 @@ Print additional information about the operations (not) executed.
 
 =back
 
-=head2 Transforms
+=head2 Transforms with global effect
+
+=over 4
+
+=item B<-T>, B<--transcode>
+
+Decodes each filename before processing and encodes it after processing, according to the given encoding you supply.
+
+To encode output in a different encoding than input was decoded, supply two encoding names, separated by a colon, e.g. C<-T latin1:utf-8>.
+
+Only the last C<-T> parameter on the command line is effective.
+
+=back
+
+=head2 Transforms performed in sequence
 
 =over 4
 
@@ -350,14 +364,6 @@ Quoting issues aside, this is equivalent to supplying a C<-e 's/\Qfrom/to/'>.
 =item B<-S>, B<--subst-all>
 
 Same as C<-s>, but replaces I<every> instance of the C<from> text by the C<to> text.
-
-=item B<-T>, B<--transcode>
-
-Decodes each filename before processing and encodes it after processing, according to the given encoding you supply.
-
-To encode output in a different encoding than input was decoded, supply two encoding names, separated by a colon, e.g. C<-T latin1:utf-8>.
-
-Only the last C<-T> parameter on the command line is effective.
 
 =item B<-x>, B<--remove-extension>
 
