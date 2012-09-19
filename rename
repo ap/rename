@@ -272,7 +272,7 @@ Since operations are cumulative, this would end up substituting (some of) the F<
 
 You can combine the various transformational options to suit your needs. F.ex files from Microsoft(tm) Windows systems often have blanks and (sometimes nothing but) capital letters in their names. Let's say you have a bunch of such files to clean up, and you also want to move them to subdirectories based on extension. The following command should help:
 
- rename -p -c --noctrl --nometa --nows -e '$_ = "$1/$_" if /(\..*)\z/' *
+ rename -p -c -z -e '$_ = "$1/$_" if /(\..*)\z/' *
 
 Again you need to pay attention to order sensitivity for transformational options. If you placed the C<-c> after the C<-e> in the above example, files with F<.zip> and F<.ZIP> extensions would be (attempted to be) moved to different directories because the directory name prefix would be added before the filenames were normalized. Once again, use verbose dry run requested using C<-nv> to get an idea of what exactly a complex rename operation is going to do.
 
@@ -352,7 +352,7 @@ Only the last C<-T> parameter on the command line is effective.
 
 =back
 
-=head2 Transforms performed in sequence
+=head2 Transforms applied in sequence
 
 =over 4
 
@@ -430,15 +430,15 @@ Replace every shell meta-character by an underscore.
 
 Using the C<-M> switch, you can quickly put F<rename> to use for just about everything the CPAN offers:
 
-=head2 Coarsely latinize a directory full of files with non-Latin characters
+=head3 Coarsely latinize a directory full of files with non-Latin characters
 
  rename -T utf8 -MText::Unidecode '$_ = unidecode $_' *
 
 See L<Text::Unidecode>.
 
-=head2 Sort a directory of pictures into monthwise subdirectories
+=head3 Sort a directory of pictures into monthwise subdirectories
 
- rename -p -MImage::EXIF '$_ = "$1-$2/$_" if Image::EXIF->new->file_name($_)->get_image_info->{"Image Created"} =~ /(\d\d\d\d):(\d\d)/'
+ rename -p -MImage::EXIF '$_ = "$1-$2/$_" if Image::EXIF->new->file_name($_)->get_image_info->{"Image Created"} =~ /(\d\d\d\d):(\d\d)/' *.jpeg
 
 See L<Image::EXIF>.
 
