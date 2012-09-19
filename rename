@@ -73,6 +73,7 @@ GetOptions(
 	't|sort-time'               => \my $opt_time_sort,
 	'v|verbose+'                => \$msglevel,
 
+	'M|use=s'                   => \@::USE,
 	'T|transcode=s'             => \my $opt_transcode,
 
 	'a|append=s'                => sub { push @EXPR, "\$_ .= qq[${\quotemeta $_[1]}]" },
@@ -121,6 +122,14 @@ my $code = do {
 		die "No such encoding $out_enc\n" if not ref $::ENCODE;
 		unshift @EXPR, '$_ = $::DECODE->decode($_)';
 		push    @EXPR, '$_ = $::ENCODE->encode($_)';
+	}
+
+	my $i = @::USE;
+	for ( reverse @::USE ) {
+		s/\A([^=]+)=?//;
+		my $use = "use $1";
+		$use .= ' split /,/, $::USE['.--$i.']' if length;
+		unshift @EXPR, $use;
 	}
 
 	my $cat = sprintf 'sub { %s }', join '; ', @EXPR;
@@ -316,6 +325,12 @@ Print additional information about the operations (not) executed.
 =head2 Transforms with global effect
 
 =over 4
+
+=item B<-M>, B<--use>
+
+Like perl's own C<-M> switch. Loads the named modules at the beginning of the rename, and can pass import options separated by commata after an equals sign, i.e. C<Module=foo,bar> will pass the C<foo> and C<bar> import options to C<Module>.
+
+You may load multiple modules by using this option multiple times.
 
 =item B<-T>, B<--transcode>
 
