@@ -223,6 +223,10 @@ __END__
 
 rename - renames multiple files
 
+=head1 VERSION
+
+version 1.100
+
 =head1 SYNOPSIS
 
 FIXME
