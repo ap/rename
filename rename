@@ -97,6 +97,7 @@ GetOptions(
 	'S|subst-all'               => sub { push @EXPR, argv_to_subst_expr('g') },
 	'x|remove-extension'        => sub { push @EXPR, 's/(\.[^.]+)\z//' },
 	'X|keep-extension'          => sub { push @EXPR, 's/(\.[^.]+)\z// and substr $::EXT, 0, 0, $1'; ++$do_keep_ext },
+	'z|sanitize'                => sub { push @EXPR, @library{ qw( nows noctrl nometa ) } },
 
 	map +( $_ => sub { push @EXPR, $library{ $_ } } ), keys %library,
 ) or pod2usage();
