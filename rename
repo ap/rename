@@ -99,7 +99,7 @@ GetOptions(
 	'X|keep-extension'          => sub { push @EXPR, 's/(\.[^.]+)\z// and substr $::EXT, 0, 0, $1'; ++$do_keep_ext },
 	'z|sanitize'                => sub { push @EXPR, @library{ qw( nows noctrl nometa ) } },
 
-	map +( $_ => sub { push @EXPR, $library{ $_ } } ), keys %library,
+	map { my $recipe = $_; $recipe => sub { push @EXPR, $library{ $recipe } } } keys %library,
 ) or pod2usage();
 
 $VERB ||= VERB_FOR->{ 'rename' };
