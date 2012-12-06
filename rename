@@ -59,7 +59,7 @@ my ( $VERB, @EXPR );
 my $do_keep_ext;
 
 my %library = (
-	camelcase => 's/([[:alpha:]])/\U$1/g',
+	camelcase => 's/([[:alpha:]]+)/\u$1/g',
 	urlesc    => 's/%([0-9A-F][0-9A-F])/chr hex $1/ieg',
 	nows      => 's/[_[:blank:]]+/_/g',
 	rews      => 'y/_/ /',
