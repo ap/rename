@@ -438,7 +438,8 @@ See L<Text::Unidecode>.
 
 =head3 Sort a directory of pictures into monthwise subdirectories
 
- rename -p -MImage::EXIF '$_ = "$1-$2/$_" if Image::EXIF->new->file_name($_)->get_image_info->{"Image Created"} =~ /(\d\d\d\d):(\d\d)/' *.jpeg
+ rename -p -MImage::EXIF '$_ = "$1-$2/$_" if Image::EXIF->new->file_name($_)
+   ->get_image_info->{"Image Created"} =~ /(\d\d\d\d):(\d\d)/' *.jpeg
 
 See L<Image::EXIF>.
 
