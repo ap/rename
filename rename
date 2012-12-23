@@ -68,7 +68,7 @@ my %library = (
 );
 
 GetOptions(
-	'h|help'                    => sub { pod2usage( -verbose => 1 ) },
+	'h|help'                    => sub { pod2usage() },
 	'man'                       => sub { pod2usage( -verbose => 2 ) },
 	'0|null'                    => \my $opt_null,
 	'f|force'                   => \my $opt_force,
@@ -104,7 +104,7 @@ GetOptions(
 $VERB ||= VERB_FOR->{ 'rename' };
 
 if ( not @EXPR ) {
-	pod2usage( -verbose => 1 ) if not @ARGV or -e $ARGV[0];
+	pod2usage() if not @ARGV or -e $ARGV[0];
 	push @EXPR, shift;
 }
 
@@ -230,22 +230,71 @@ version 1.100
 
 =head1 SYNOPSIS
 
-FIXME
+F<rename>
+B<[switches|transforms]>
+B<[files]>
 
-=cut
+Switches:
 
-# F<rename>
-# S<B<[ -0 ]>>
-# S<B<[ -c ]>>
-# S<B<[ -C ]>>
-# S<B<[ -e code ]>>
-# S<B<[ -f ]>>
-# S<B<[ -i ]>>
-# S<B<[ -l | -L ]>>
-# S<B<[ -n ]>>
-# S<B<[ -s from to ]>>
-# S<B<[ -v ]>>
-# S<B<[ files ]>>
+=over 1
+
+=item B<-0>/B<--null> (when reading from STDIN)
+
+=item B<-f>/B<--force>E<nbsp>orE<nbsp>B<-i>/B<--interactive> (proceed or prompt when overwriting)
+
+=item B<-g>/B<--glob> (expand C<*> etc. in filenames, useful in Windows F<CMD.EXE>)
+
+=item B<-k>/B<--backwards>/B<--reverse-order>
+
+=item B<-l>/B<--symlink>E<nbsp>orE<nbsp>B<-L>/B<--hardlink>
+
+=item B<-M>/B<--use=I<Module>>
+
+=item B<-n>/B<--just-print>/B<--dry-run>
+
+=item B<-p>/B<--mkpath>/B<--make-dirs>
+
+=item B<-t>/B<--sort-time>
+
+=item B<-T>/B<--transcode=I<encoding>>
+
+=item B<-v>/B<--verbose>
+
+=back
+
+Transforms, applied sequentially:
+
+=over 1
+
+=item B<-a>/B<--append=I<str>>
+
+=item B<-A>/B<--prepend=I<str>>
+
+=item B<-c>/B<--lower-case>
+
+=item B<-C>/B<--upper-case>
+
+=item B<-d>/B<--delete=I<str>>
+
+=item B<-D>/B<--delete-all=I<str>>
+
+=item B<-e>/B<--expr=I<code>>
+
+=item B<-P>/B<--pipe=I<cmd>>
+
+=item B<-s>/B<--subst I<from> I<to>>
+
+=item B<-S>/B<--subst-all I<from> I<to>>
+
+=item B<-x>/B<--remove-extension>
+
+=item B<-X>/B<--keep-extension>
+
+=item B<-z>/B<--sanitize>
+
+=item B<--camelcase>E<nbsp>B<--urlesc>E<nbsp>B<--nows>E<nbsp>B<--rews>E<nbsp>B<--noctrl>E<nbsp>B<--nometa> (see manual)
+
+=back
 
 =head1 DESCRIPTION
 
