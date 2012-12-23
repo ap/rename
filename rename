@@ -77,13 +77,12 @@ GetOptions(
 	'k|backwards|reverse-order' => \my $opt_backwards,
 	'l|symlink'                 => sub { $VERB ? pod2usage( -verbose => 1 ) : ( $VERB = VERB_FOR->{ 'symlink' } ) },
 	'L|hardlink'                => sub { $VERB ? pod2usage( -verbose => 1 ) : ( $VERB = VERB_FOR->{    'link' } ) },
+	'M|use=s'                   => \@::USE,
 	'n|just-print|dry-run'      => \my $opt_dryrun,
 	'p|mkpath|make-dirs'        => \my $opt_mkpath,
 	't|sort-time'               => \my $opt_time_sort,
-	'v|verbose+'                => \$msglevel,
-
-	'M|use=s'                   => \@::USE,
 	'T|transcode=s'             => \my $opt_transcode,
+	'v|verbose+'                => \$msglevel,
 
 	'a|append=s'                => sub { push @EXPR, "\$_ .= qq[${\quotemeta $_[1]}]" },
 	'A|prepend=s'               => sub { push @EXPR, "substr \$_, 0, 0, qq[${\quotemeta $_[1]}]" },
@@ -318,6 +317,12 @@ Create symlinks from the new names to the existing ones, instead of renaming the
 
 Create hard links from the new names to the existing ones, instead of renaming the files. B<Cannot be used in conjunction with C<-l>.>
 
+=item B<-M>, B<--use>
+
+Like perl's own C<-M> switch. Loads the named modules at the beginning of the rename, and can pass import options separated by commata after an equals sign, i.e. C<Module=foo,bar> will pass the C<foo> and C<bar> import options to C<Module>.
+
+You may load multiple modules by using this option multiple times.
+
 =item B<-n>, B<--dry-run>, B<--just-print>
 
 Show how the files would be renamed, but don't actually do anything.
@@ -325,22 +330,6 @@ Show how the files would be renamed, but don't actually do anything.
 =item B<-p>, B<--mkpath>, B<--make-dirs>
 
 Create any non-existent directories in the target path. This is very handy if you want to scatter a pile of files into subdirectories based on some part of their name (eg. the first two letters or the extension): you don't need to make all necessary directories beforehand, just tell C<rename> to create them as necessary.
-
-=item B<-v>, B<--verbose>
-
-Print additional information about the operations (not) executed.
-
-=back
-
-=head2 Transforms with global effect
-
-=over 4
-
-=item B<-M>, B<--use>
-
-Like perl's own C<-M> switch. Loads the named modules at the beginning of the rename, and can pass import options separated by commata after an equals sign, i.e. C<Module=foo,bar> will pass the C<foo> and C<bar> import options to C<Module>.
-
-You may load multiple modules by using this option multiple times.
 
 =item B<-T>, B<--transcode>
 
@@ -350,9 +339,15 @@ To encode output in a different encoding than input was decoded, supply two enco
 
 Only the last C<-T> parameter on the command line is effective.
 
+=item B<-v>, B<--verbose>
+
+Print additional information about the operations (not) executed.
+
 =back
 
-=head2 Transforms applied in sequence
+=head2 Transforms
+
+Transforms are applied to filenames sequentially. You can use them multiple times; their effects will accrue.
 
 =over 4
 
