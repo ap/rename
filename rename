@@ -108,7 +108,9 @@ if ( not @EXPR ) {
 	push @EXPR, shift;
 }
 
-pod2usage( -verbose => 1 ) if $opt_null and @ARGV;
+pod2usage( -verbose => 1 )
+	if $opt_null and @ARGV
+	or $opt_interactive and $opt_force;
 
 ++$msglevel if $opt_dryrun;
 
