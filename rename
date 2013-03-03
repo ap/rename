@@ -4,6 +4,9 @@ use warnings;
 
 use Getopt::Long 2.24, qw( :config bundling no_ignore_case no_auto_abbrev );
 
+my ( $EXT, @USE, $DECODE, $ENCODE );
+sub compile { eval shift } # defined early to control the lexical environment
+
 my $msglevel = 0;
 sub ERROR (&) { print STDERR $_[0]->(), "\n" if $msglevel > -1 };
 sub INFO  (&) { print STDERR $_[0]->(), "\n" if $msglevel >  0 };
@@ -77,7 +80,7 @@ GetOptions(
 	'k|backwards|reverse-order' => \my $opt_backwards,
 	'l|symlink'                 => sub { $VERB ? pod2usage( -verbose => 1 ) : ( $VERB = VERB_FOR->{ 'symlink' } ) },
 	'L|hardlink'                => sub { $VERB ? pod2usage( -verbose => 1 ) : ( $VERB = VERB_FOR->{    'link' } ) },
-	'M|use=s'                   => \@::USE,
+	'M|use=s'                   => \@USE,
 	'n|just-print|dry-run'      => \my $opt_dryrun,
 	'p|mkpath|make-dirs'        => \my $opt_mkpath,
 	't|sort-time'               => \my $opt_time_sort,
@@ -95,7 +98,7 @@ GetOptions(
 	's|subst'                   => sub { push @EXPR, argv_to_subst_expr },
 	'S|subst-all'               => sub { push @EXPR, argv_to_subst_expr('g') },
 	'x|remove-extension'        => sub { push @EXPR, 's/(\.[^.]+)\z//' },
-	'X|keep-extension'          => sub { push @EXPR, 's/(\.[^.]+)\z// and substr $::EXT, 0, 0, $1'; ++$do_keep_ext },
+	'X|keep-extension'          => sub { push @EXPR, 's/(\.[^.]+)\z// and substr $EXT, 0, 0, $1'; ++$do_keep_ext },
 	'z|sanitize'                => sub { push @EXPR, @library{ qw( nows noctrl nometa ) } },
 
 	map { my $recipe = $_; $recipe => sub { push @EXPR, $library{ $recipe } } } keys %library,
@@ -116,33 +119,33 @@ pod2usage( -verbose => 1 )
 
 my $code = do {
 	if ( $do_keep_ext ) {
-		unshift @EXPR, '$::EXT = ""';
-		push    @EXPR, 'substr $::EXT, 0, 1, "" if not length; $_ .= $::EXT';
+		unshift @EXPR, '$EXT = ""';
+		push    @EXPR, 'substr $EXT, 0, 1, "" if not length; $_ .= $EXT';
 	}
 
 	if ( $opt_transcode ) {
 		require Encode;
 		my ( $in_enc, $out_enc ) = split /:/, $opt_transcode, 2;
-		$::DECODE = Encode::find_encoding( $in_enc );
-		die "No such encoding $in_enc\n" if not ref $::DECODE;
-		$::ENCODE = defined $out_enc ? Encode::find_encoding( $out_enc ) : $::DECODE;
-		die "No such encoding $out_enc\n" if not ref $::ENCODE;
-		unshift @EXPR, '$_ = $::DECODE->decode($_)';
-		push    @EXPR, '$_ = $::ENCODE->encode($_)';
+		$DECODE = Encode::find_encoding( $in_enc );
+		die "No such encoding $in_enc\n" if not ref $DECODE;
+		$ENCODE = defined $out_enc ? Encode::find_encoding( $out_enc ) : $ENCODE;
+		die "No such encoding $out_enc\n" if not ref $ENCODE;
+		unshift @EXPR, '$_ = $DECODE->decode($_)';
+		push    @EXPR, '$_ = $ENCODE->encode($_)';
 	}
 
-	my $i = @::USE;
-	for ( reverse @::USE ) {
+	my $i = @USE;
+	for ( reverse @USE ) {
 		s/\A([^=]+)=?//;
 		my $use = "use $1";
-		$use .= ' split /,/, $::USE['.--$i.']' if length;
+		$use .= ' split /,/, $USE['.--$i.']' if length;
 		unshift @EXPR, $use;
 	}
 
 	my $cat = sprintf 'sub { %s }', join '; ', @EXPR;
 	DEBUG { "Using expression: $cat" };
 
-	my $evaled = eval $cat;
+	my $evaled = compile $cat;
 	die $@ if $@;
 	die "Evaluation to subref failed. Check expression using -nv\n"
 		unless 'CODE' eq ref $evaled;
@@ -173,7 +176,7 @@ if ( $opt_time_sort ) {
 @ARGV = reverse @ARGV if $opt_backwards;
 
 for ( @ARGV ) {
-    my $old = $_;
+	my $old = $_;
 
 	$code->();
 
