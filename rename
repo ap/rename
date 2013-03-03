@@ -367,7 +367,7 @@ Create any non-existent directories in the target path. This is very handy if yo
 
 =item B<-T>, B<--transcode>
 
-Decodes each filename before processing and encodes it after processing, according to the given encoding you supply.
+Decode each filename before processing and encode it after processing, according to the given encoding supplied.
 
 To encode output in a different encoding than input was decoded, supply two encoding names, separated by a colon, e.g. C<-T latin1:utf-8>.
 
