@@ -134,11 +134,11 @@ my $code = do {
 		push    @EXPR, '$_ = $ENCODE->encode($_)';
 	}
 
-	my $i = @USE;
+	my $i = $#USE;
 	for ( reverse @USE ) {
 		s/\A([^=]+)=?//;
 		my $use = "use $1";
-		$use .= ' split /,/, $USE['.--$i.']' if length;
+		$use .= ' split /,/, $USE['.$i--.']' if length;
 		unshift @EXPR, $use;
 	}
 
