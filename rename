@@ -111,9 +111,11 @@ if ( not @EXPR ) {
 	push @EXPR, shift;
 }
 
-pod2usage( -verbose => 1 )
-	if $opt_null and @ARGV
-	or $opt_interactive and $opt_force;
+pod2usage( -message => 'Error: --null only permitted when reading filenames from STDIN' )
+	if $opt_null and @ARGV;
+
+pod2usage( -message => 'Error: --interactive and --force are mutually exclusive' )
+	if $opt_interactive and $opt_force;
 
 ++$msglevel if $opt_dryrun;
 
