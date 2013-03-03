@@ -176,7 +176,7 @@ if ( $opt_time_sort ) {
 @ARGV = reverse @ARGV if $opt_backwards;
 
 for ( @ARGV ) {
-    my $old = $_;
+	my $old = $_;
 
 	$code->();
 
