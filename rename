@@ -4,7 +4,7 @@ use warnings;
 
 use Getopt::Long 2.24, qw( :config bundling no_ignore_case no_auto_abbrev );
 
-my ( $EXT, @USE, $DECODE, $ENCODE );
+my ( $N, $EXT, @USE, $DECODE, $ENCODE );
 sub compile { eval shift } # defined early to control the lexical environment
 
 my $msglevel = 0;
@@ -82,6 +82,7 @@ GetOptions(
 	'L|hardlink'                => sub { $VERB ? pod2usage( -verbose => 1 ) : ( $VERB = VERB_FOR->{    'link' } ) },
 	'M|use=s'                   => \@USE,
 	'n|just-print|dry-run'      => \my $opt_dryrun,
+	'N|counter-format=s'        => \my $opt_ntmpl,
 	'p|mkpath|make-dirs'        => \my $opt_mkpath,
 	't|sort-time'               => \my $opt_time_sort,
 	'T|transcode=s'             => \my $opt_transcode,
@@ -116,6 +117,19 @@ pod2usage( -message => 'Error: --null only permitted when reading filenames from
 
 pod2usage( -message => 'Error: --interactive and --force are mutually exclusive' )
 	if $opt_interactive and $opt_force;
+
+my $n = 1;
+my $nwidth = 0;
+if ( defined $opt_ntmpl ) {
+	$opt_ntmpl =~ /\A(?:(\.\.\.0)|(0+))([0-9]+)\z/
+		or pod2usage( -message => "Error: unparseable counter format $opt_ntmpl" );
+	$nwidth = (
+		$1 ? -1 :
+		$2 ? length $opt_ntmpl :
+		0
+	);
+	$n = $3;
+}
 
 ++$msglevel if $opt_dryrun;
 
@@ -181,9 +195,12 @@ if ( $opt_time_sort ) {
 
 @ARGV = reverse @ARGV if $opt_backwards;
 
+$nwidth = length $n+@ARGV if $nwidth < 0;
+
 for ( @ARGV ) {
 	my $old = $_;
 
+	$N = sprintf '%0*d', $nwidth, $n++;
 	$code->();
 
 	if ( $old eq $_ ) {
@@ -260,6 +277,8 @@ Switches:
 =item B<-M>/B<--use=I<Module>>
 
 =item B<-n>/B<--just-print>/B<--dry-run>
+
+=item B<-N>/B<--counter-format>
 
 =item B<-p>/B<--mkpath>/B<--make-dirs>
 
@@ -360,6 +379,14 @@ You may load multiple modules by using this option multiple times.
 =item B<-n>, B<--dry-run>, B<--just-print>
 
 Show how the files would be renamed, but don't actually do anything.
+
+=item B<-N>/B<--counter-format>
+
+Format and set the C<$N> counter variable according to the given template.
+
+E.g. C<-N 001> will make C<$N> start at 1 and be zero-padded to 3 digits, whereas C<-N 0099> will start the counter at 99 and zero-pad it to 4 digits. And so forth. Only digits are allowed in this simple form.
+
+As a special form, you can prefix the template with C<...0> to indicate that C<rename> should determine the width automatically based upon the number of files. E.g. if you pass C<-N ...01> along with 300 files, C<$N> will range from C<001> to C<300>.
 
 =item B<-p>, B<--mkpath>, B<--make-dirs>
 
