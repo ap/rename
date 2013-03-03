@@ -144,6 +144,10 @@ my $code = do {
 		unshift @EXPR, $use;
 	}
 
+	if ( eval 'require feature' and $^V =~ /^v(5\.[1-9][0-9]+)/ ) {
+		unshift @EXPR, "use feature ':$1'";
+	}
+
 	my $cat = sprintf 'sub { %s }', join '; ', @EXPR;
 	DEBUG { "Using expression: $cat" };
 
