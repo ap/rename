@@ -124,8 +124,8 @@ if ( defined $opt_ntmpl ) {
 	$opt_ntmpl =~ /\A(?:(\.\.\.0)|(0+))([0-9]+)\z/
 		or pod2usage( -message => "Error: unparseable counter format $opt_ntmpl" );
 	$nwidth = (
-		$1 ? -1 :
-		$2 ? length $opt_ntmpl :
+		defined $1 ? -1 :
+		defined $2 ? length $opt_ntmpl :
 		0
 	);
 	$n = $3;
