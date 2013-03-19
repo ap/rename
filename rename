@@ -456,6 +456,10 @@ Save and remove the last extension from a filename, if there is any. The saved e
 
 Repeating this option will save multiple levels of extension in the right order.
 
+=item B<-z>, B<--sanitize>
+
+A shortcut for passing C<--nows --noctrl --nometa>.
+
 =item B<--camelcase>
 
 Capitalise every separate word within the filename.
@@ -478,7 +482,7 @@ Replace all sequences of control characters in the filename with single undersco
 
 =item B<--nometa>
 
-Replace every shell meta-character by an underscore.
+Replace every shell meta-character with an underscore.
 
 =back
 
