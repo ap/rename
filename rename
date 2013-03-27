@@ -493,6 +493,30 @@ Replace every shell meta-character with an underscore.
 
 =back
 
+=head1 VARIABLES
+
+These predefined variables are available for use within any C<-e> expressions you pass.
+
+=over 4
+
+=item B<$N>
+
+A counter that increments for each file in the list. By default, counts up from 1.
+
+The C<-N> takes a template that specifies the padding and starting value; see L</Switches>.
+
+=item B<$EXT>
+
+A string containing the accumulated extensions saved by C<-X> switches, without a leading dot. See L</Switches>.
+
+=item B<@EXT>
+
+An array containing the accumulated extensions saved by C<-X> switches, from right to left, without any dots.
+
+The right-most extension is always C<$EXT[0]>, the left-most (if any) is C<$EXT[-1]>.
+
+=back
+
 =head1 TUTORIAL
 
 For example, to rename all files matching C<*.bak> to strip the extension, you might say
