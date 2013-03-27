@@ -4,7 +4,7 @@ use warnings;
 
 use Getopt::Long 2.24, qw( :config bundling no_ignore_case no_auto_abbrev );
 
-my ( $N, $EXT, @USE, $DECODE, $ENCODE );
+my ( $N, $EXT, @EXT, @USE, $DECODE, $ENCODE );
 sub compile { eval shift } # defined early to control the lexical environment
 
 my $msglevel = 0;
@@ -59,7 +59,6 @@ sub pipe_through {
 }
 
 my ( $VERB, @EXPR );
-my $do_keep_ext;
 
 my %library = (
 	camelcase => 's/([[:alpha:]]+)/\u$1/g',
@@ -99,8 +98,8 @@ GetOptions(
 	'P|pipe=s'                  => sub { require IPC::Open2; push @EXPR, "pipe_through '\Q$_[1]\E'" },
 	's|subst'                   => sub { push @EXPR, argv_to_subst_expr },
 	'S|subst-all'               => sub { push @EXPR, argv_to_subst_expr('g') },
-	'x|remove-extension'        => sub { push @EXPR, 's/(\.[^.]+)\z//' },
-	'X|keep-extension'          => sub { push @EXPR, 's/(\.[^.]+)\z// and substr $EXT, 0, 0, $1'; ++$do_keep_ext },
+	'x|remove-extension'        => sub { push @EXPR, 's/\. [^.]+ \z//x' },
+	'X|keep-extension'          => sub { push @EXPR, 's/\.([^.]+)\z//x and do { push @EXT, $1; $EXT = join ".", reverse @EXT }' },
 	'z|sanitize'                => sub { push @EXPR, @library{ qw( nows noctrl nometa ) } },
 
 	map { my $recipe = $_; $recipe => sub { push @EXPR, $library{ $recipe } } } keys %library,
@@ -140,11 +139,6 @@ if ( defined $opt_ntmpl ) {
 ++$msglevel if $opt_dryrun;
 
 my $code = do {
-	if ( $do_keep_ext ) {
-		unshift @EXPR, '$EXT = ""';
-		push    @EXPR, 'substr $EXT, 0, 1, "" if not length; $_ .= $EXT';
-	}
-
 	if ( $opt_transcode ) {
 		require Encode;
 		my ( $in_enc, $out_enc ) = split /:/, $opt_transcode, 2;
@@ -208,6 +202,7 @@ for ( @ARGV ) {
 
 	$N = sprintf '%0*d', $nwidth, $n++;
 	$code->();
+	$_ = join '.', $_, reverse splice @EXT if @EXT;
 
 	if ( $old eq $_ ) {
 		DEBUG { "'$old' unchanged" };
