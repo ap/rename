@@ -84,6 +84,7 @@ GetOptions(
 	'n|just-print|dry-run'      => \my $opt_dryrun,
 	'N|counter-format=s'        => \my $opt_ntmpl,
 	'p|mkpath|make-dirs'        => \my $opt_mkpath,
+	'stdin!'                    => \my $opt_stdin,
 	't|sort-time'               => \my $opt_time_sort,
 	'T|transcode=s'             => \my $opt_transcode,
 	'v|verbose+'                => \$msglevel,
@@ -105,6 +106,8 @@ GetOptions(
 	map { my $recipe = $_; $recipe => sub { push @EXPR, $library{ $recipe } } } keys %library,
 ) or pod2usage();
 
+$opt_stdin = @ARGV ? 0 : 1 unless defined $opt_stdin;
+
 $VERB ||= VERB_FOR->{ 'rename' };
 
 if ( not @EXPR ) {
@@ -112,8 +115,11 @@ if ( not @EXPR ) {
 	push @EXPR, shift;
 }
 
+pod2usage( -message => 'Error: --stdin and filename arguments are mutually exclusive' )
+	if $opt_stdin and @ARGV;
+
 pod2usage( -message => 'Error: --null only permitted when reading filenames from STDIN' )
-	if $opt_null and @ARGV;
+	if $opt_null and not $opt_stdin;
 
 pod2usage( -message => 'Error: --interactive and --force are mutually exclusive' )
 	if $opt_interactive and $opt_force;
@@ -173,7 +179,7 @@ my $code = do {
 	$evaled;
 };
 
-if ( !@ARGV ) {
+if ( $opt_stdin ) {
 	local $/ = $/;
 	INFO { "Reading filenames from STDIN" };
 	@ARGV = do {
@@ -281,6 +287,8 @@ Switches:
 =item B<-N>/B<--counter-format>
 
 =item B<-p>/B<--mkpath>/B<--make-dirs>
+
+=item B<--stdin>/B<--no-stdin>
 
 =item B<-t>/B<--sort-time>
 
@@ -391,6 +399,10 @@ As a special form, you can prefix the template with C<...0> to indicate that C<r
 =item B<-p>, B<--mkpath>, B<--make-dirs>
 
 Create any non-existent directories in the target path. This is very handy if you want to scatter a pile of files into subdirectories based on some part of their name (eg. the first two letters or the extension): you don't need to make all necessary directories beforehand, just tell C<rename> to create them as necessary.
+
+=item B<--stdin>, B<--no-stdin>
+
+Always E<ndash> or never E<ndash> read the list of filenames from STDIN; do not guess based on the presence or absence of filename arguments. B<Filename arguments must not be present when using C<--stdin>.>
 
 =item B<-T>, B<--transcode>
 
