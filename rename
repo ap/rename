@@ -269,7 +269,7 @@ Switches:
 
 =item B<-f>/B<--force>E<nbsp>orE<nbsp>B<-i>/B<--interactive> (proceed or prompt when overwriting)
 
-=item B<-g>/B<--glob> (expand C<*> etc. in filenames, useful in Windows F<CMD.EXE>)
+=item B<-g>/B<--glob> (expand C<*> etc. in filenames, useful in WindowsE<trade> F<CMD.EXE>)
 
 =item B<-k>/B<--backwards>/B<--reverse-order>
 
@@ -329,7 +329,9 @@ Transforms, applied sequentially:
 
 =head1 DESCRIPTION
 
-C<rename> renames the filenames supplied according to the rules specified. If a given filename is not modified, it will not be renamed. If no filenames are given on the command line, filenames will be read via standard input.
+This program renames files according to modification rules specified on the command line. If no filenames are given on the command line, a list of filenames will be expected on standard input.
+
+The documentation contains a L</TUTORIAL>.
 
 =head1 OPTIONS
 
@@ -447,8 +449,6 @@ Pass the filename to an external command on its standard input and read back the
 
 Perform a simple textual substitution of C<from> to C<to>. The C<from> and C<to> parameters must immediately follow the argument.
 
-Quoting issues aside, this is equivalent to supplying a C<-e 's/\Qfrom/to/'>.
-
 =item B<-S>, B<--subst-all>
 
 Same as C<-s>, but replaces I<every> instance of the C<from> text by the C<to> text.
@@ -519,31 +519,48 @@ The right-most extension is always C<$EXT[0]>, the left-most (if any) is C<$EXT[
 
 =head1 TUTORIAL
 
-For example, to rename all files matching C<*.bak> to strip the extension, you might say
+F<rename> takes a list of filenames, runs a list of modification rules against each filename, checks if the result is different from the original filename, and if so, renames the file. The most I<flexible> way to use it is to pass a line of Perl code as the rule; the most I<convenient> way is to employ the many switches available to supply rules for common tasks such as stripping extensions.
 
- rename 's/\.bak$//' *.bak
+For example, to strip the extension from all C<.bak> files, you might use either of these command lines:
 
-If you are confident that none of the filenames has C<.bak> anywhere else than at the end, you can also use the much easier typed
+ rename -x *.bak
+ rename 's/\.bak\z//' *
 
- rename -s .bak '' *.bak
+These do not achive their results in exactly the same way: the former only takes the files that match C<*.bak> in the first place, then strips their last extension; the latter takes all files and strips a C<.bak> from the end of those filenames that have it. As another alternative, if you are confident that none of the filenames has C<.bak> anywhere else than at the end, you might instead choose to write the latter approach using the C<-s> switch:
 
-You can always do multiple changes in one go:
+ rename -s .bak '' *
 
- rename -s .tgz .tar.gz -s .tbz2 .tar.bz2 *.tar.*
+Of course you can do multiple changes in one go:
 
-Note however that transformational options are order sensitive. The following would probably surprise you:
+ rename -s .tgz .tar.gz -s .tbz2 .tar.bz2 *.t?z*
+
+But note that transforms are order sensitive. The following will not do what you probably meant:
 
  rename -s foo bar -s bar baz *
 
-Since operations are cumulative, this would end up substituting (some of) the F<foo> matches in filenames with F<baz>! So pay attention to order. You may want to request a verbose dry run with C<-n> for the first stab at a complex rename operation.
+Because rules are cumulative, this would first substitute F<foo> with F<bar>; in the resulting filenames, it would then substitute F<bar> with F<baz>. So in most cases, it would end up substituting F<foo> with F<baz> E<ndash> probably not your intention. So you need to consider the order of rules.
+
+If you are unsure that your modification rules will do the right thing, try doing a verbose dry run to check what its results would be. A dry run is requested by passing C<-n>:
 
  rename -n -s bar baz -s foo bar *
 
-You can combine the various transformational options to suit your needs. F.ex files from Microsoft(tm) Windows systems often have blanks and (sometimes nothing but) capital letters in their names. Let's say you have a bunch of such files to clean up, and you also want to move them to subdirectories based on extension. The following command should help:
+You can combine the various transforms to suit your needs. E.g. files from MicrosoftE<trade> WindowsE<trade> systems often have blanks and (sometimes nothing but) capital letters in their names. Let's say you have a heap of such files to clean up, I<and> you also want to move them to subdirectories based on extension. The following command will do this for you:
 
- rename -p -c -z -e '$_ = "$1/$_" if /(\..*)\z/' *
+ rename -p -c -z -X -e '$_ = "$EXT/$_" if @EXT' *
 
-Again you need to pay attention to order sensitivity for transformational options. If you placed the C<-c> after the C<-e> in the above example, files with F<.zip> and F<.ZIP> extensions would be (attempted to be) moved to different directories because the directory name prefix would be added before the filenames were normalized. Once again, use verbose dry run requested using C<-nv> to get an idea of what exactly a complex rename operation is going to do.
+Here, C<-p> tells F<rename> to create directories if necessary; C<-c> tells it to lower-case the filename; C<-X> remembers the file extension in the C<$EXT> and C<@EXT> variables; and finally, the C<-e> expression uses those to prepend the extension to the filename as a directory, I<if> there is one.
+
+That brings us to the secret weapon in F<rename>'s arsenal: the C<-X> switch. This is a transform that clips the extension off the filename and stows it away at that point during the application of the rules. After all rules are finished, the remembered extension is appended back onto the filename. (You can use multiple C<-X> switches, and they will accumulate multiple extensions as you would expect.) This allows you to do use simple way for doing many things that would get much trickier if you had to make sure to not affect the extension. E.g.:
+
+ rename -X -c --rews --camelcase --nows *
+
+This will uppercase the first letter of every word in every filename while leaving its extension exactly as before. Or, consider this:
+
+ rename -N ...01 -X -e '$_ = "File-$N"' *
+
+This will throw away all the existing filenames and simply number the files from 1 through however many files there are E<ndash> except that it will preserve their extensions.
+
+Incidentally, note the C<-N> switch and the C<$N> variable used in the Perl expression. See L</Switches> and L</VARIABLES> for documentation.
 
 =head1 COOKBOOK
 
