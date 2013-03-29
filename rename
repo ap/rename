@@ -67,6 +67,7 @@ my %library = (
 	rews      => 'y/_/ /',
 	noctrl    => 's/[_[:cntrl:]]+/_/g',
 	nometa    => 'tr/_!"&()=?`*\':;<>|$/_/s',
+	trim      => 's/\A[ _]+//, s/[ _]+\z//'
 );
 
 GetOptions(
@@ -323,7 +324,7 @@ Transforms, applied sequentially:
 
 =item B<-z>/B<--sanitize>
 
-=item B<--camelcase>E<nbsp>B<--urlesc>E<nbsp>B<--nows>E<nbsp>B<--rews>E<nbsp>B<--noctrl>E<nbsp>B<--nometa> (see manual)
+=item B<--camelcase>E<nbsp>B<--urlesc>E<nbsp>B<--nows>E<nbsp>B<--rews>E<nbsp>B<--noctrl>E<nbsp>B<--nometa>E<nbsp>B<--trim> (see manual)
 
 =back
 
@@ -490,6 +491,10 @@ Replace all sequences of control characters in the filename with single undersco
 =item B<--nometa>
 
 Replace every shell meta-character with an underscore.
+
+=item B<--trim>
+
+Remove any sequence of spaces and underscores at the left and right ends of the filename.
 
 =back
 
