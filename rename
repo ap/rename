@@ -508,7 +508,7 @@ These predefined variables are available for use within any C<-e> expressions yo
 
 A counter that increments for each file in the list. By default, counts up from 1.
 
-The C<-N> takes a template that specifies the padding and starting value; see L</Switches>.
+The C<-N> switch takes a template that specifies the padding and starting value of C<$N>; see L</Switches>.
 
 =item B<$EXT>
 
