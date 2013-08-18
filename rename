@@ -111,6 +111,7 @@ $opt_stdin = @ARGV ? 0 : 1 unless defined $opt_stdin;
 $VERB ||= VERB_FOR->{ 'rename' };
 
 if ( not @EXPR ) {
+	no warnings 'newline';
 	pod2usage() if not @ARGV or -e $ARGV[0];
 	push @EXPR, shift;
 }
