@@ -12,7 +12,8 @@ sub ERROR (&) { print STDERR $_[0]->(), "\n" if $msglevel > -1 };
 sub INFO  (&) { print STDERR $_[0]->(), "\n" if $msglevel >  0 };
 sub DEBUG (&) { print STDERR $_[0]->(), "\n" if $msglevel >  1 };
 
-sub pod2usage { require Pod::Usage;     goto &Pod::Usage::pod2usage }
+sub pod2usage { use open qw( :locale :std );
+                require Pod::Usage;     goto &Pod::Usage::pod2usage }
 sub mkpath    { require File::Path;     goto &File::Path::mkpath }
 sub dirname   { require File::Basename; goto &File::Basename::dirname }
 
