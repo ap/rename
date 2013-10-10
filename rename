@@ -223,7 +223,7 @@ for ( @ARGV ) {
 	}
 
 	if ( $opt_interactive ) {
-		print "\u$VERB->{inf} '$old' to '$_'? [n] ";
+		print "\u$VERB->{inf} '$old' to '$_' (y/n)? [n] ";
 		if ( <STDIN> !~ /^y(?:es)?$/i ) {
 			DEBUG { "Skipping '$old'." };
 			next;
