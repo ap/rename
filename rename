@@ -585,8 +585,13 @@ See L<Text::Unidecode>.
 
  rename -p -MImage::EXIF '$_ = "$1-$2/$_" if Image::EXIF->new->file_name($_)
    ->get_image_info->{"Image Created"} =~ /(\d\d\d\d):(\d\d)/' *.jpeg
+ 
+ # or
+ 
+ rename -p -MImage::ExifTool=:Public '$_ = "$1-$2/$_"
+   if ImageInfo($_)->{"CreateDate"} =~ /(\d\d\d\d):(\d\d)/' *.jpeg
 
-See L<Image::EXIF>.
+See L<Image::EXIF>, L<Image::ExifTool>.
 
 =head1 SEE ALSO
 
