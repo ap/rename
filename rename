@@ -268,6 +268,8 @@ Switches:
 
 =over 1
 
+=item B<--man> (read the full manual)
+
 =item B<-0>/B<--null> (when reading from STDIN)
 
 =item B<-f>/B<--force>E<nbsp>orE<nbsp>B<-i>/B<--interactive> (proceed or prompt when overwriting)
