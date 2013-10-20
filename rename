@@ -573,6 +573,22 @@ Incidentally, note the C<-N> switch and the C<$N> variable used in the Perl expr
 
 =head1 COOKBOOK
 
+=head2 Recursive renaming in subdirectories
+
+Since F<rename> only operates on file names given on the command line, it may not be obvious how it can be used to rename files recursively in subdirectories: using tools outside of F<rename>.
+
+The portable option is to pipe a list of file names to it already:
+
+ find somedir -print0 | rename -0 -e 'print "$_\n"'
+
+But when you invoke F<rename> from zsh or from a semi-recent bash with the C<globstar> option enabled, you can use double asterisks in your globs to make them recursive:
+
+ rename -e 'print "$_\n"' somedir/**
+
+Note that F<rename> will then operate on the entire path, not just the filename. (A future version of F<rename> may add mechanisms to address this.)
+
+=head2 Putting the CPAN to use
+
 Using the C<-M> switch, you can quickly put F<rename> to use for just about everything the CPAN offers:
 
 =head3 Coarsely latinize a directory full of files with non-Latin characters
