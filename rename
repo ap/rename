@@ -62,7 +62,7 @@ sub pipe_through {
 my ( $VERB, @EXPR );
 
 my %library = (
-	camelcase => 's/([[:alpha:]]+)/\u$1/g',
+	camelcase => 's/(?<!\p{Cased_Letter})(\p{Cased_Letter})/\u$1/g',
 	urlesc    => 's/%([0-9A-F][0-9A-F])/chr hex $1/ieg',
 	nows      => 's/[_[:blank:]]+/_/g',
 	rews      => 'y/_/ /',
