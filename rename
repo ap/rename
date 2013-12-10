@@ -147,7 +147,7 @@ my $code = do {
 		my ( $in_enc, $out_enc ) = split /:/, $opt_transcode, 2;
 		$DECODE = Encode::find_encoding( $in_enc );
 		die "No such encoding $in_enc\n" if not ref $DECODE;
-		$ENCODE = defined $out_enc ? Encode::find_encoding( $out_enc ) : $ENCODE;
+		$ENCODE = defined $out_enc ? Encode::find_encoding( $out_enc ) : $DECODE;
 		die "No such encoding $out_enc\n" if not ref $ENCODE;
 		unshift @EXPR, '$_ = $DECODE->decode($_)';
 		push    @EXPR, '$_ = $ENCODE->encode($_)';
