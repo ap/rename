@@ -35,17 +35,6 @@ use constant VERB_FOR => {
 	},
 };
 
-sub argv_to_subst_expr {
-	my $modifier = shift || '';
-	pod2usage( -verbose => 1 ) if @ARGV < 2;
-	my ($from, $to) = map quotemeta, splice @ARGV, 0, 2;
-	# the ugly \${\""} construct is necessary because unknown backslash escapes are
-	# not treated the same in pattern- vs doublequote-quoting context; only the
-	# latter lets us do the right thing with problematic input like
-	# ']{ool(haracter$' or maybe '>><//((/>'
-	sprintf 's/\Q${\"%s"}/%s/%s', $from, $to, $modifier;
-}
-
 sub pipe_through {
 	my ( $cmd ) = @_;
 	IPC::Open2::open2( my $in, my $out, $cmd ) or do {
@@ -60,6 +49,17 @@ sub pipe_through {
 }
 
 my ( $VERB, @EXPR );
+
+sub parse_subst {
+	my $modifier = 'subst-all' eq $_[0] ? 'g' : '';
+	pod2usage( -verbose => 1 ) if @ARGV < 2;
+	my ($from, $to) = map quotemeta, splice @ARGV, 0, 2;
+	# the ugly \${\""} construct is necessary because unknown backslash escapes are
+	# not treated the same in pattern- vs doublequote-quoting context; only the
+	# latter lets us do the right thing with problematic input like
+	# ']{ool(haracter$' or maybe '>><//((/>'
+	push @EXPR, sprintf 's/\Q${\"%s"}/%s/%s', $from, $to, $modifier;
+}
 
 my %library = (
 	camelcase => 's/(?<!\p{Cased_Letter})(\p{Cased_Letter})/\u$1/g',
@@ -98,11 +98,12 @@ GetOptions(
 	'D|delete-all=s'            => sub { push @EXPR, "s/${\quotemeta $_[1]}//g" },
 	'e|expr=s'                  => \@EXPR,
 	'P|pipe=s'                  => sub { require IPC::Open2; push @EXPR, "pipe_through '\Q$_[1]\E'" },
-	's|subst'                   => sub { push @EXPR, argv_to_subst_expr },
-	'S|subst-all'               => sub { push @EXPR, argv_to_subst_expr('g') },
 	'x|remove-extension'        => sub { push @EXPR, 's/\. [^.]+ \z//x' },
 	'X|keep-extension'          => sub { push @EXPR, 's/\.([^.]+)\z//x and do { push @EXT, $1; $EXT = join ".", reverse @EXT }' },
 	'z|sanitize'                => sub { push @EXPR, @library{ qw( nows noctrl nometa trim ) } },
+
+	's|subst'                   => \&parse_subst,
+	'S|subst-all'               => \&parse_subst,
 
 	map { my $recipe = $_; $recipe => sub { push @EXPR, $library{ $recipe } } } keys %library,
 ) or pod2usage();
