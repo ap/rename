@@ -609,6 +609,12 @@ See L<Text::Unidecode>.
 
 See L<Image::EXIF>, L<Image::ExifTool>.
 
+=head3 Fix up mail attachments stored under MIME-encoded names
+
+ rename -MEncode '$_=decode "MIME-Header", $_ if /^=/' =*
+
+See L<Encode::MIME::Header>.
+
 =head1 SEE ALSO
 
 mv(1), perl(1), find(1), grep(1), sort(1)
