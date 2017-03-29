@@ -61,15 +61,22 @@ sub pipe_through {
 
 my ( $VERB, @EXPR );
 
+sub parse_ws {
+	my $code = ${{ nows => 's/[_[:blank:]]+/%s/g', rews => 'y/%s/ /' }}{ $_[0] };
+	my $chr = $_[1];
+	1 == length $chr or die "Option $_[0] argument must be a single character\n";
+	push @EXPR, sprintf $code, quotemeta $chr;
+}
+
 my %library = (
 	camelcase => 's/(?<!\p{Cased_Letter})(\p{Cased_Letter})/\u$1/g',
 	urlesc    => 's/%([0-9A-F][0-9A-F])/chr hex $1/ieg',
-	nows      => 's/[_[:blank:]]+/_/g',
-	rews      => 'y/_/ /',
 	noctrl    => 's/[_[:cntrl:]]+/_/g',
 	nometa    => 'tr/_!"&()=?`*\':;<>|$/_/s',
 	trim      => 's/\A[ _]+//, s/[ _]+\z//'
 );
+
+( /\A--((?:re|no)ws)\z/ or next ), ( $1 or last ), $_ .= '=_' for @ARGV;
 
 GetOptions(
 	'h|help'                    => sub { pod2usage() },
@@ -102,7 +109,10 @@ GetOptions(
 	'S|subst-all'               => sub { push @EXPR, argv_to_subst_expr('g') },
 	'x|remove-extension'        => sub { push @EXPR, 's/\. [^.]+ \z//x' },
 	'X|keep-extension'          => sub { push @EXPR, 's/\.([^.]+)\z//x and do { push @EXT, $1; $EXT = join ".", reverse @EXT }' },
-	'z|sanitize'                => sub { push @EXPR, @library{ qw( nows noctrl nometa trim ) } },
+	'z|sanitize'                => sub { unshift @ARGV, qw( --nows=_ --noctrl --nometa --trim ) },
+
+	'nows=s'                    => \&parse_ws,
+	'rews=s'                    => \&parse_ws,
 
 	map { my $recipe = $_; $recipe => sub { push @EXPR, $library{ $recipe } } } keys %library,
 ) or pod2usage();
