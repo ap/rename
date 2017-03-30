@@ -492,11 +492,11 @@ Decode URL-escaped filenames, such as wget(1) used to produce.
 
 =item B<--nows>
 
-Replace all sequences of whitespace in the filename with single underscore characters.
+Replace all sequences of whitespace in the filename with a single character. By default, whitespace is replaced with an underscore. To use another character, you may pass it as an option.
 
 =item B<--rews>
 
-Reverse C<--nows>: replace each underscore in the filename with a space.
+Reverse C<--nows>: replace each underscore in the filename with a space. If you wish to specify a character other than an underscore, you may pass it as an option.
 
 =item B<--noctrl>
 
