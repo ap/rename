@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Getopt::Long 2.24, qw( :config bundling no_ignore_case no_auto_abbrev );
+use Getopt::Long 2.24 qw( :config bundling no_ignore_case no_auto_abbrev );
 
 my ( $N, $EXT, @EXT, @USE, $DECODE, $ENCODE );
 sub compile { eval shift } # defined early to control the lexical environment
