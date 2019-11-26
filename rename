@@ -442,6 +442,14 @@ Convert file names to all lower case.
 
 Convert file names to all upper case.
 
+=item B<-d>, B<--delete>
+
+Remove the first instance of the string argument you supply.
+
+=item B<-D>, B<--delete-all>
+
+Remove every instance of the string argument you supply.
+
 =item B<-e>, B<--expr>
 
 The C<code> argument to this option should be a Perl expression that assumes the filename in the C<$_> variable and modifies it for the filenames to be renamed. When no other C<-c>, C<-C>, C<-e>, C<-s>, or C<-z> options are given, you can omit the C<-e> from infront of the code.
