@@ -129,7 +129,7 @@ pod2usage( -message => 'Error: --interactive and --force are mutually exclusive'
 my $n = 1;
 my $nwidth = 0;
 if ( defined $opt_ntmpl ) {
-	$opt_ntmpl =~ /\A(?:(\.\.\.0)|(0+))([0-9]+)\z/
+	$opt_ntmpl =~ /\A(?:(\.\.\.0)|(0+))?([0-9]+)\z/
 		or pod2usage( -message => "Error: unparseable counter format $opt_ntmpl" );
 	$nwidth = (
 		defined $1 ? -1 :
