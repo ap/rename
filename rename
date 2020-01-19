@@ -127,7 +127,7 @@ pod2usage( -message => 'Error: --interactive and --force are mutually exclusive'
 	if $opt_interactive and $opt_force;
 
 pod2usage( -message => "Error: unparseable counter format $opt_ntmpl" )
-	if defined $opt_ntmpl and $opt_ntmpl !~ /\A(?:(\.\.\.0)|(0+))([0-9]+)\z/;
+	if defined $opt_ntmpl and $opt_ntmpl !~ /\A(?:(\.\.\.0)|(0+))?([0-9]+)\z/;
 
 my $n = 1;
 my $nwidth = 0;
