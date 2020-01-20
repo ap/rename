@@ -127,18 +127,9 @@ pod2usage( -message => 'Error: --interactive and --force are mutually exclusive'
 	if $opt_interactive and $opt_force;
 
 pod2usage( -message => "Error: unparseable counter format $opt_ntmpl" )
-	if defined $opt_ntmpl and $opt_ntmpl !~ /\A(?:(\.\.\.0)|(0+))?([0-9]+)\z/;
+	if defined $opt_ntmpl and $opt_ntmpl !~ /\A(?:(\.\.\.0)|(?=[0-9]))([0-9]+)\z/;
 
-my $n = 1;
-my $nwidth = 0;
-if ( defined $opt_ntmpl ) {
-	$nwidth = (
-		defined $1 ? -1 :
-		defined $2 ? length $opt_ntmpl :
-		0
-	);
-	$n = $3;
-}
+my ( $n, $do_auto_width ) = defined $opt_ntmpl ? ( $2, defined $1 ) : 1;
 
 ++$msglevel if $opt_dryrun;
 
@@ -199,7 +190,10 @@ if ( $opt_time_sort ) {
 
 @ARGV = reverse @ARGV if $opt_backwards;
 
-$nwidth = length $n+@ARGV if $nwidth < 0;
+my $nwidth
+	= $do_auto_width ? length $n+@ARGV
+	: $n =~ /\A0/    ? length $n
+	: 0;
 
 for ( @ARGV ) {
 	my $old = $_;
