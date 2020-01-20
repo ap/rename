@@ -126,11 +126,12 @@ pod2usage( -message => 'Error: --null only permitted when reading filenames from
 pod2usage( -message => 'Error: --interactive and --force are mutually exclusive' )
 	if $opt_interactive and $opt_force;
 
+pod2usage( -message => "Error: unparseable counter format $opt_ntmpl" )
+	if defined $opt_ntmpl and $opt_ntmpl !~ /\A(?:(\.\.\.0)|(0+))([0-9]+)\z/;
+
 my $n = 1;
 my $nwidth = 0;
 if ( defined $opt_ntmpl ) {
-	$opt_ntmpl =~ /\A(?:(\.\.\.0)|(0+))([0-9]+)\z/
-		or pod2usage( -message => "Error: unparseable counter format $opt_ntmpl" );
 	$nwidth = (
 		defined $1 ? -1 :
 		defined $2 ? length $opt_ntmpl :
