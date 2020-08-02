@@ -191,7 +191,7 @@ if ( $opt_time_sort ) {
 @ARGV = reverse @ARGV if $opt_backwards;
 
 my $nwidth
-	= $do_auto_width ? length $n+@ARGV
+	= $do_auto_width ? length $n+$#ARGV
 	: $n =~ /\A0/    ? length $n
 	: 0;
 
