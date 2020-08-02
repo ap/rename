@@ -245,6 +245,10 @@ for ( @ARGV ) {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 rename - renames multiple files
@@ -635,3 +639,5 @@ Idea, inspiration and original code from Larry Wall and Robin Barker.
 =head1 COPYRIGHT
 
 This script is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
